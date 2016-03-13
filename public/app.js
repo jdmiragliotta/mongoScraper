@@ -20,15 +20,8 @@ $(document).ready(function(){
 
 
 
-      $(".container").append(newDiv);
+      $(".row").append(newDiv);
 
     });
   });
-
-
-
-
-
-
-
 });

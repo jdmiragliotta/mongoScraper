@@ -15,6 +15,7 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded({
   extended: false
 }));
+
 app.use(express.static("public"));
 
 //Connect To Database
@@ -59,8 +60,8 @@ app.get("/", function(req, res){
           console.log(dbArticle);
         }
       });
-      res.sendFile(process.cwd() + '/index.html')
     });
+    res.sendfile(process.cwd() + '/index.html')
   });
 });
 
@@ -70,8 +71,7 @@ app.get('/displayInfo', function(req, res) {
     if(err) {
       throw err;
     }
-
-    res.json(ArticleData);
+    res.json(articleData);
   })
 });
 
