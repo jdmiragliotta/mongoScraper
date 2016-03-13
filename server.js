@@ -37,28 +37,31 @@ var Article = require('./models/articleModel.js');
 
 app.get("/", function(req, res){
   //Scrape Reddit
-  request("https://www.reddit.com/r/CSS", function (error, response, html) {
+  request("https://news.ycombinator.com/", function (error, response, html) {
     var $ = cheerio.load(html);
-    $("p.title").each(function(i, element) {
-      var title = $(this).text();
-      var link = $(element).children().attr('href');
+    $("td.title:nth-child(3)>a").each(function(i, element) {
+
+      var articleTitle = $(element).text();
+      var articleLink = $(element).attr('href');
+      // console.log(articleTitle);
+      // console.log(articleLink);
+      // Create New Instance
+      var insertedArticle = new Article({
+        title : articleTitle,
+        link: articleLink
+       });
+
+    // Save to Database
+      insertedArticle.save(function(err, dbArticle) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(dbArticle);
+        }
+      });
+      res.sendFile(process.cwd() + '/index.html')
     });
   });
- // Create New Instance
-  var insertedArticle = new Article({
-    "title" : title,
-    "link": link
-  });
-  // Save to Database
-  insertedArticle.save(function(err, dbArticle) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(dbArticle);
-    }
-  });
-
-  res.sendFile(process.cwd() + '/index.html')
 });
 
 
