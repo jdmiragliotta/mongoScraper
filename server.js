@@ -1,22 +1,24 @@
-var express = require("express")
-var mongoose = require("mongoose")
-var bodyParser = require("body-parser")
-var cheerio = require("cheerio")
-var request = require("request")
+var express = require("express");
+var mongoose = require("mongoose");
+var bodyParser = require("body-parser");
+var cheerio = require("cheerio");
+var request = require("request");
+var logger = require('morgan');
 var expressHandlebars = require("express-handlebars");
-var app = epress();
+var app = express();
 var PORT = process.env.PORT || 8000;
 
 app.engine('handlebars', expressHandlebars({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
+app.use(logger('dev'));
 app.use(bodyParser.urlencoded({
   extended: false
 }));
 app.use(express.static("public"));
 
 //Connect To Database
-mongoose.connect("mongodb://localhost/scrapernotes");
+mongoose.connect("mongodb://localhost/scraperNotes");
 var db = mongoose.connection;
 
 db.on('error', function(err) {
@@ -28,44 +30,39 @@ db.once('open', function() {
 
 //Require Schema
 
-var Note = require('./models/noteModel.js');
+// var Note = require('./models/noteModel.js');
 var Article = require('./models/articleModel.js');
 
 
-// Routes
-app.get('/', function(req, res) {
-  res.send("index.html");
-});
 
-
-
-
-//Scrapes Hacker News
-app.get("/scrape", function(req, res){
-  request('https://news.ycombinator.com/', function (error, response, html) {
+app.get("/", function(req, res){
+  //Scrape Reddit
+  request("https://www.reddit.com/r/CSS", function (error, response, html) {
     var $ = cheerio.load(html);
-    var result = [];
-    $('td.title:nth-child(3)>a').each(function(i, element){
-      var title = $(element).text(),
-      var link =  $(element).attr('href')
-      if(title && link){
-        db.scrapedData.save({
-          title: title,
-          link: link
-        }, function(err,saved){
-          if(err){
-            console.log(err);
-          }else{
-            console.log(saved);
-          }
-        });
-      }
+    $("p.title").each(function(i, element) {
+      var title = $(this).text();
+      var link = $(element).children().attr('href');
     });
   });
+ // Create New Instance
+  var insertedArticle = new Article({
+    "title" : title,
+    "link": link
+  });
+  // Save to Database
+  insertedArticle.save(function(err, dbArticle) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(dbArticle);
+    }
+  });
+
+  res.sendFile(process.cwd() + '/index.html')
 });
 
 
 
-app.listen(3000, function(){
-  console.log("App running!");
+app.listen(PORT, function() {
+  console.log('App running on port %s', PORT);
 });
