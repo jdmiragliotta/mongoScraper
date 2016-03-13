@@ -31,7 +31,7 @@ db.once('open', function() {
 
 //Require Schema
 
-// var Note = require('./models/noteModel.js');
+var Note = require('./models/noteModel.js');
 var Article = require('./models/articleModel.js');
 
 
