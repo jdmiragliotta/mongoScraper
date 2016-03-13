@@ -72,7 +72,7 @@ app.get('/displayInfo', function(req, res) {
       throw err;
     }
     res.json(articleData);
-  })
+  }).limit(20);
 });
 
 
