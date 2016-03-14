@@ -5,9 +5,13 @@ var ArticleSchema = new Schema({
   title:{
     type:String
   },
-   link:{
+  link:{
     type:String
-  }
+  },
+  notes: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Note'
+  }]
 });
 
 var Article = mongoose.model("Article", ArticleSchema);

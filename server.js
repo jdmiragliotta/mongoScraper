@@ -57,11 +57,11 @@ app.get("/", function(req, res){
         if (err) {
           console.log(err);
         } else {
-          console.log(dbArticle);
+          // console.log(dbArticle);
         }
       });
     });
-    res.sendfile(process.cwd() + '/index.html')
+    res.sendFile(process.cwd() + '/index.html')
   });
 });
 
@@ -72,8 +72,31 @@ app.get('/displayInfo', function(req, res) {
       throw err;
     }
     res.json(articleData);
-  }).limit(20);
+  }).limit(10);
 });
+
+app.post("/submit", function(req, res){
+  var newNote = new Note({
+    noteBody: req.body.noteBody});
+
+  newNote.save(function(err, doc) {
+    if (err) {
+      res.send(err);
+    } else {
+      Article.findOneAndUpdate({
+        "_id": req.body.articleid},
+        {$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
+        if (err) {
+          res.send(err);
+        } else {
+            res.json(articleData);
+        }
+      });
+    }
+  });
+});
+
+
 
 
 
