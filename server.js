@@ -83,15 +83,14 @@ app.post("/submit", function(req, res){
     if (err) {
       res.send(err);
     } else {
-      Article.findOneAndUpdate({
-        "_id": req.body.articleid},
-        {$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
-        if (err) {
-          res.send(err);
-        } else {
-            res.json(articleData);
+      Article.findOneAndUpdate({"_id": req.body.articleId},{$push: {'notes': doc._id}}, {new: true}, function(err, articleData) {
+        if(err) {
+          throw err;
+        }else {
+          res.sendFile(process.cwd() + '/index.html');
         }
       });
+
     }
   });
 });
