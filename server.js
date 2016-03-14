@@ -66,13 +66,21 @@ app.get("/", function(req, res){
 });
 
 app.get('/displayInfo', function(req, res) {
-
   Article.find({}, function(err, articleData) {
     if(err) {
       throw err;
     }
     res.json(articleData);
   }).limit(10);
+});
+
+app.get('/displayNotes', function(req, res) {
+ Note.find({}, function(err, noteData) {
+    if(err) {
+      throw err;
+    }
+    res.json(noteData);
+  });
 });
 
 app.post("/submit", function(req, res){
@@ -90,7 +98,13 @@ app.post("/submit", function(req, res){
           res.sendFile(process.cwd() + '/index.html');
         }
       });
-
+      Note.findOneAndUpdate({"_id": doc._id},{$set: {'_articleId': req.body.articleId}}, function(err, articleData) {
+        if(err) {
+          throw err;
+        }else {
+          res.sendFile(process.cwd() + '/index.html');
+        }
+      });
     }
   });
 });
